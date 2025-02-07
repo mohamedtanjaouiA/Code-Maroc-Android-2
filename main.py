@@ -955,7 +955,7 @@ def main(page:Page):
     row_activation_mo3arif=Row(spacing=20,controls=[Button_clear_copy_mo3arif,Text_mo3arif],alignment="center")
 
     
-    TextField_activation=TextField()
+    TextField_activation=TextField(width=230)
     row_activation_TextField_activation=Row(spacing=20,controls=[TextField_activation],alignment="center")
 
 
@@ -1031,12 +1031,12 @@ def main(page:Page):
     #TextAnswer
     text_writre_trueAnswer=TextField(multiline=True,min_lines=7,max_lines=7,width=400)
     
-    #B_copy
-    B_copy=FilledButton(text="لصق",on_click=paste_text)
+    #B_paste
+    B_paste=FilledButton(text="لصق",icon=Icons.CONTENT_PASTE,on_click=paste_text)
 
     #
-    #B_copy
-    B_delete=FilledButton(text="مسح",on_click=on_click_detele_text)
+    #B_paste
+    B_delete=FilledButton(text="مسح",icon=Icons.DELETE,on_click=on_click_detele_text)
 
     
         
@@ -1046,7 +1046,7 @@ def main(page:Page):
         TextButton(text="نعم",on_click=command_save_yes),
         TextButton(text="لا" , on_click=command_save_no),
     ]
-    #B_save
+    
     alert_dialog_save=AlertDialog(
                     title=Text("حفظ"),content=Text("هل تريد الحفظ ؟"),
                     actions=material_actions
@@ -1054,10 +1054,10 @@ def main(page:Page):
 
     
         
-    
+    #B_save
     B_save=FilledButton(text="حفظ",on_click=command_ask_yesy_no_to_save)
 
-    row_copy_save=Row(spacing=20, controls=[B_save,B_copy,B_delete],alignment="center")
+    row_copy_save=Row(spacing=20, controls=[B_delete,B_paste,B_save],alignment="center")
 
     
     
