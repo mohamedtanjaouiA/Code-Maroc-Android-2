@@ -131,6 +131,8 @@ ACT=ACTIVATION()
 ASSETS="assets//"
 os.makedirs(ASSETS,exist_ok=1)
 SIZE_TEXT=30
+H_BUTTON_BACK=40
+SIZE_TEXT_NUMBER_QUESTION=25
 DIR_FILE_ACTIVATION=ASSETS+"activation.txt"
 DIR_FILE_ANSEWER_AND_INFOS=ASSETS+"answer_and_info.txt"
 DIR_FILE_TRUE_ANSWER=ASSETS+"true_answer.txt"
@@ -225,9 +227,11 @@ def organizeAnswer(answer):
     
 
 def on_click_principal(e,list_Buttons,text_answer,page,number_question):
-        print("on_click_principal")
-        val = e.control.text
+        print("on_click_principal")#rja3
+        #val = e.control.text
+        val=e.control.content.value
         index=int(val)-1
+        print("val  :: ",val)
         B=list_Buttons[index]
 
         old_color=B.bgcolor
@@ -244,8 +248,9 @@ def on_click_principal(e,list_Buttons,text_answer,page,number_question):
         answer=""
         for B  in list_Buttons  :
             if  B.bgcolor=="blue" :
-                print(B.text)
-                answer+=str(B.text)+"-"
+                txt_B=B.content.value
+                print(txt_B)
+                answer+=str(txt_B)+"-"
         new_answer=organizeAnswer(answer)
         print(new_answer)
 
@@ -359,17 +364,19 @@ def main(page:Page):
     #on_click_1
     def on_click(e):
         if VAR_ACTIVATION:
-            number_question=int(B_number_question.text.split("-")[1])
+            number_question=int(B_number_question.content.value.split("-")[1])
             on_click_principal(e,list_Buttons,text_answer,page,number_question)
         else :
             show_alerte_activation()
 
     def on_click_on_button_correction(e):
         global B_CORRECTION_CLICKED ,  TXT_ANSWER,TXT_TRUE_ANSWER
-        n=int(e.control.text)
+        #n=int(e.control.text)
+        n=int(e.control.content.value)
+        
         
         if not  B_CORRECTION_CLICKED==None :
-            i=int(B_CORRECTION_CLICKED.text)-1
+            i=int(B_CORRECTION_CLICKED.content.value)-1
             #print("TXT_ANSWER[i:i+1],TXT_TRUE_ANSWER[i:i+1] ",TXT_ANSWER[i:i+1],TXT_TRUE_ANSWER[i:i+1])
             if TXT_ANSWER[i:i+1]==TXT_TRUE_ANSWER[i:i+1]:
                 B_CORRECTION_CLICKED.bgcolor='green'
@@ -395,7 +402,7 @@ def main(page:Page):
 
     def go_next_question(e):
         
-        n=int(B_number_question.text.split("-")[1])      
+        n=int(B_number_question.content.value.split("-")[1])      
         if n<40 :
             #go_to_specific_question
             go_to_specific_question(n+1)
@@ -410,7 +417,7 @@ def main(page:Page):
 
     def go_previeous_question(e):
         print("go_previeous_question")
-        n=int(B_number_question.text.split("-")[1])
+        n=int(B_number_question.content.value.split("-")[1])
         if n>1 :
             n-=1
 
@@ -418,9 +425,11 @@ def main(page:Page):
         go_to_specific_question(n)
 
     def on_click_B_number_question(e):
+        '''
         txt=e.control.text
         print(txt)
         [PopupMenuItem(text=f"السؤال-{i+1}",on_click=changeNumberQuestion) for i in range(40) ]
+        '''
         
 
     def ask_restart_yes_no(e):
@@ -451,7 +460,7 @@ def main(page:Page):
             write_number_quesion(n)
 
             #upadet name in button li mktbo fih number questio li black
-            B_number_question.text=f"السؤال-{n}"
+            B_number_question.content.value=f"السؤال-{n}"
             
 
             #load answer
@@ -985,7 +994,7 @@ def main(page:Page):
     
 
     #B_restart
-    B_restart = FilledButton(text="إبدأ من جديد",bgcolor="black",color="white",width=B_with, height=50
+    B_restart = FilledButton(content=Text("إبدأ من جديد",size=15),bgcolor="black",color="white",width=B_with, height=50
                                      ,on_click=ask_restart_yes_no)
 
     #material_actions 
@@ -1003,24 +1012,24 @@ def main(page:Page):
     page.add(B_restart)
     
     
-    B_number_question = FilledButton(text="السؤال-1",bgcolor="black",color="white",width=B_with, height=40
+    B_number_question = FilledButton(content=Text("السؤال-1",size=SIZE_TEXT_NUMBER_QUESTION),bgcolor="black",color="white",width=B_with, height=40
                                      ,on_click=on_click_B_number_question)
 
     #
     text_answer=TextButton(text="-", width=B_with, height=40)
 
-    B1=FilledButton(text="1",bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
-    B2=FilledButton(text="2",bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
-    B3=FilledButton(text="3",bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
-    B4=FilledButton(text="4",bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
+    B1=FilledButton(content=Text("1",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
+    B2=FilledButton(content=Text("2",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
+    B3=FilledButton(content=Text("3",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
+    B4=FilledButton(content=Text("4",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
     list_Buttons=[B1,B2,B3,B4]
     
     list_number_question_text_answser=[B_number_question,text_answer]
 
-    B_back=FilledButton(text="<",bgcolor="black",color="white",width=int(B_with/2)-10
-                        ,on_click=go_previeous_question)
-    B_next=FilledButton(text=">",bgcolor="black",color="white",width=int(B_with/2)-10
-                        ,on_click=go_next_question)
+    B_back=FilledButton(content=Text("<",size=25),bgcolor="black",color="white",width=int(B_with/2)-10
+                        ,on_click=go_previeous_question,height=H_BUTTON_BACK)
+    B_next=FilledButton(content=Text(">",size=25),bgcolor="black",color="white",width=int(B_with/2)-10
+                        ,on_click=go_next_question,height=H_BUTTON_BACK)
     #row_next_back
     row_next_back=Row(spacing=20, controls=[B_back,B_next],alignment="center")
 
@@ -1093,7 +1102,8 @@ def main(page:Page):
     
     list_all_buttons_corrections=[]
     for i in range(40):
-            b_correction=FilledButton(text=str(i+1),width=55 ,height=43,bgcolor="blue",on_click=on_click_on_button_correction)
+            b_correction=FilledButton(content=Text(str(i+1),size=20),width=55
+                                      ,height=43,bgcolor="blue",on_click=on_click_on_button_correction)
             list_all_buttons_corrections.append(b_correction)
 
     #list_rows_corrections
@@ -1110,10 +1120,10 @@ def main(page:Page):
     page.add(divider)
         
     #row_result_back
-    b_back_to_answer=FilledButton(text="<",bgcolor="black",color="white", width=63*2
-                        ,on_click=command_b_back_to_answer)
+    b_back_to_answer=FilledButton(content=Text("<",size=25),bgcolor="black",color="white", width=63*2
+                        ,on_click=command_b_back_to_answer,height=H_BUTTON_BACK)
 
-    text_result=FilledButton(text="النتيجة : 40/40",bgcolor='green', width=63*2)
+    text_result=FilledButton(text="النتيجة : 40/40",bgcolor='green', width=63*2,height=H_BUTTON_BACK)
     row_result_back=Row(spacing=10, controls=[b_back_to_answer,text_result],alignment="center")
     row_result_back.visible=False
 
