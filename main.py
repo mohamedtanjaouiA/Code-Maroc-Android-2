@@ -1,5 +1,31 @@
 from flet import *
 import os
+import requests
+
+
+def current_year_is_2025():
+    year_2025=2025
+    current_year=None
+    test=0
+    error=''
+    try :
+        r = requests.get('http://just-the-time.appspot.com/')
+        #2025-03-19
+        current_year=int(str(r.content.decode().strip()).split('-')[0])
+        if current_year!=year_2025 :
+            error="This year is not 2025."
+            print(current_year)
+        else :
+            test=1
+            error="It will be Activated."
+    except Exception as e:
+        if "Failed to establish a new connection" in str(e) :
+            error='The phone is not connected to the internet.'
+
+    return test,error
+
+
+
 
 
 
@@ -132,7 +158,7 @@ ASSETS="assets//"
 os.makedirs(ASSETS,exist_ok=1)
 SIZE_TEXT=30
 H_BUTTON_BACK=40
-SIZE_TEXT_NUMBER_QUESTION=25
+SIZE_TEXT_NUMBER_QUESTION=18
 DIR_FILE_ACTIVATION=ASSETS+"activation.txt"
 DIR_FILE_ANSEWER_AND_INFOS=ASSETS+"answer_and_info.txt"
 DIR_FILE_TRUE_ANSWER=ASSETS+"true_answer.txt"
@@ -264,7 +290,7 @@ def on_click_principal(e,list_Buttons,text_answer,page,number_question):
 
         #update text_answer
         #print(text_answer)
-        text_answer.text=new_answer
+        text_answer.content.value=new_answer
 
         
         
@@ -283,8 +309,11 @@ def on_click_principal(e,list_Buttons,text_answer,page,number_question):
 
 def check_stability_serial_number():
         current_serial_number=str(ACT.get_date_cretaion_assets_as_serial_number())
-        txt_content="أغلق التطبيق و قم بإعادة تشغيله حتى يظهر معرف الهاتف"
-        #f"{serial_number} : تعريف الهاتف "        
+        txt_content_arabic="أغلق التطبيق و قم بإعادة تشغيله حتى يظهر معرف الهاتف. قد تقوم بهذه 4 مرات كحد أقصى"
+        txt_content_english="Close the app and restart it until the phone ID appears. You can do this up to 4 times at most."
+        txt_content=txt_content_arabic+"\n"+txt_content_english
+        #f"{serial_number} : تعريف الهاتف "
+        
         test=0
         
 
@@ -302,7 +331,7 @@ def check_stability_serial_number():
             print(serial_number_read_from_file,current_serial_number)
             #comparer
             if  current_serial_number==serial_number_read_from_file:
-                txt_content=f"{current_serial_number} : معرف  الهاتف "
+                txt_content=f"ID Phone : {current_serial_number}  "
                 test=1
             else :
                 f=open(FILE_CHECK_STABILITY_SERIAL_NUMBER,'w')
@@ -428,7 +457,7 @@ def main(page:Page):
         '''
         txt=e.control.text
         print(txt)
-        [PopupMenuItem(text=f"السؤال-{i+1}",on_click=changeNumberQuestion) for i in range(40) ]
+        [PopupMenuItem(text=f"سؤال-{i+1}",on_click=changeNumberQuestion) for i in range(40) ]
         '''
         
 
@@ -460,7 +489,7 @@ def main(page:Page):
             write_number_quesion(n)
 
             #upadet name in button li mktbo fih number questio li black
-            B_number_question.content.value=f"السؤال-{n}"
+            B_number_question.content.value=f"سؤال-{n}"
             
 
             #load answer
@@ -478,8 +507,8 @@ def main(page:Page):
             answer_as_list=answer.split("-") #40:-
             #print(" answer and number question ",n,answer)
 
-            #write answer to text_answer.text=new_answer
-            text_answer.text=answer
+            #write answer to text_answer.content.value=new_answer
+            text_answer.content.value=answer
 
             #colorer B_number_question  bach iwlli itbdl l couleur fach doz mn question l question
             color_=["black","white"]
@@ -821,12 +850,19 @@ def main(page:Page):
             #اغلق التطبيق.....
             if VAR_CKECK_SATBILITY==0:
                 for row_ in material_actions_activation:
-                    row_.visible=False
+                    if row_!=row_button_close_app:
+                        row_.visible=False
+                    else  :
+                        row_button_close_app.visible=True
                 alert_dialog_activation.content.value=TEXT_CONTENT
             else :
                 #ila kano mntab9in show all row and write no thing in  alert_dialog_activation
                 for row_ in material_actions_activation:
-                    row_.visible=True
+                    if row_!=row_button_close_app:
+                        row_.visible=True
+                    else :
+                        row_button_close_app.visible=False
+                        
                 alert_dialog_activation.content.value=''
                 
             page.open(alert_dialog_activation)
@@ -842,25 +878,47 @@ def main(page:Page):
     def write_key_activation(e):
         global VAR_ACTIVATION
         txt_activation_=TextField_activation.value
+        supposed_key_activation=txt_activation_
 
-        #write key
+        #hna ila dakhl l code dial 2025 parce que hada l code '1234'  ki activer l'application
+        #ila knti f 2025
+        if   txt_activation_=="1234" :
+            #hna khasni nmchi n checki l'anné
+            test,error=current_year_is_2025()
+            print(test,error)
+
+            #ila kan variment had l3am howa 2025 ghadi n activer lih l'appliction
+            #ya3ni   txt_activation_ hadi ghadi iwli
+            #txt_activation_=true_activation 
+            if test==1 :
+                date_creation_as_serial=ACT.get_date_cretaion_assets_as_serial_number()
+                true_activation=ACT.create_activation(date_creation_as_serial)
+                supposed_key_activation=true_activation
+                print(supposed_key_activation)
+        
+            else :
+                TextField_activation.value=error
+                
+        
+        #write key wakaha maykonch shih w mn b3a kan3ay 3la
+        #check_activation bach ncho wach dakchi how ahadak olal la
         #XXXXXXXXXXX
         f=open(DIR_FILE_ACTIVATION,'w')
-        f.write(str(txt_activation_))
+        f.write(str(supposed_key_activation))
         f.close()
 
         
-
-        #call ACT.check_activation and update  VAR_ACTIVATION
+        #call ACT.check_activation and update  VAR_ACTIVATION 
         VAR_ACTIVATION=ACT.check_activation()
-        
+            
         if VAR_ACTIVATION :
             #alert_dialog_activation.visible=False
             page.close(alert_dialog_activation)
         else :
-            TextField_activation.value="كود التفعيل غير صحيح"
+                TextField_activation.value="The code is incorrect, or you are not connected to the internet."
 
         page.update()
+    
 
     def paste_activation(e):
         txt=page.get_clipboard()        
@@ -877,7 +935,7 @@ def main(page:Page):
         if ":"  in txt_ :
             list_txt_=txt_.split(':')
             mo3arif_=list_txt_[0]
-            if "م"  in mo3arif_ :
+            if "D"  in mo3arif_ :
                 mo3arif_=list_txt_[1]
         page.set_clipboard(mo3arif_)
         
@@ -968,9 +1026,18 @@ def main(page:Page):
     row_activation_TextField_activation=Row(spacing=20,controls=[TextField_activation],alignment="center")
 
 
-    Button_activation=TextButton(text="تفعيل",on_click=write_key_activation)
+    Button_activation=TextButton(text="Activate",on_click=write_key_activation)
     Button_paste_activation=TextButton(icon=Icons.CONTENT_PASTE,on_click=paste_activation)
     Button_clear_activation=TextButton(icon=Icons.DELETE,on_click=clear_in_activation)
+
+    button_close_app=TextButton(text="Close App-إغلاق",icon=Icons.CLOSE,on_click=lambda e:page.window.destroy())
+
+    txt_info_2025_arabic="إذا كنت في سنة 2025 : اتصل بالانترنيت ثم ادخل الكود 1234 و اضغط على زر تفعيل."
+    txt_info_2025_english="*If you are in the year 2025,connect to\nthe internet, then enter the code\n '1234' and press the Activate button."
+    txt_info_2025=txt_info_2025_arabic+"\n"+txt_info_2025_english
+    txt_info_2025=txt_info_2025_english
+    text_info_activate_if_2025=Text(txt_info_2025)
+    
     
 
     
@@ -978,15 +1045,21 @@ def main(page:Page):
                                                         Button_paste_activation,
                                                         Button_activation],alignment="center")
 
+    
+
+    row_info_activate_if_2025=Row(spacing=20, controls=[text_info_activate_if_2025],alignment="center")
+    row_button_close_app=Row(spacing=20, controls=[button_close_app],alignment="center")
+
     #
     material_actions_activation=[row_activation_mo3arif,
                                  row_activation_TextField_activation,
-                                 row_in_activation_buttons]
+                                 row_in_activation_buttons,row_info_activate_if_2025,
+                                 row_button_close_app]
 
     #xxxxxx
     
     alert_dialog_activation=AlertDialog(
-                    title=Text("التفعيل"),
+                    title=Text("Activation"),
                     content=Text(''),
                     actions=material_actions_activation
                     )
@@ -1012,11 +1085,12 @@ def main(page:Page):
     page.add(B_restart)
     
     
-    B_number_question = FilledButton(content=Text("السؤال-1",size=SIZE_TEXT_NUMBER_QUESTION),bgcolor="black",color="white",width=B_with, height=40
+    B_number_question = FilledButton(content=Text("سؤال-1",size=SIZE_TEXT_NUMBER_QUESTION)
+                                     ,bgcolor="black",color="white",width=int(B_with/2), height=40
                                      ,on_click=on_click_B_number_question)
 
     #
-    text_answer=TextButton(text="-", width=B_with, height=40)
+    text_answer=TextButton(content=Text("-",size=SIZE_TEXT), width=B_with, height=40)
 
     B1=FilledButton(content=Text("1",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
     B2=FilledButton(content=Text("2",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
@@ -1024,14 +1098,14 @@ def main(page:Page):
     B4=FilledButton(content=Text("4",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
     list_Buttons=[B1,B2,B3,B4]
     
-    list_number_question_text_answser=[B_number_question,text_answer]
+    list_number_question_text_answser=[text_answer]
 
-    B_back=FilledButton(content=Text("<",size=25),bgcolor="black",color="white",width=int(B_with/2)-10
+    B_back=FilledButton(content=Text("<",size=25),bgcolor="black",color="white",width=int(B_with/4)-5
                         ,on_click=go_previeous_question,height=H_BUTTON_BACK)
-    B_next=FilledButton(content=Text(">",size=25),bgcolor="black",color="white",width=int(B_with/2)-10
+    B_next=FilledButton(content=Text(">",size=25),bgcolor="black",color="white",width=int(B_with/4)-5
                         ,on_click=go_next_question,height=H_BUTTON_BACK)
     #row_next_back
-    row_next_back=Row(spacing=20, controls=[B_back,B_next],alignment="center")
+    row_next_back=Row(spacing=10, controls=[B_back,B_number_question,B_next],alignment="center")
 
     column_answer=Column(spacing=20, controls=list_number_question_text_answser+list_Buttons                         
                         )
