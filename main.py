@@ -938,6 +938,9 @@ def main(page:Page):
             if "D"  in mo3arif_ :
                 mo3arif_=list_txt_[1]
         page.set_clipboard(mo3arif_)
+
+    def close_app(e):
+        page.window.close()
         
         
         
@@ -1010,7 +1013,7 @@ def main(page:Page):
     
     
     B_with=300
-    B_hieght=60
+    B_hieght=55
 
     """material_actions_activation =[
         TextField(Text(text=str(ACT.get_date_cretaion_assets_as_serial_number())),
@@ -1030,7 +1033,7 @@ def main(page:Page):
     Button_paste_activation=TextButton(icon=Icons.CONTENT_PASTE,on_click=paste_activation)
     Button_clear_activation=TextButton(icon=Icons.DELETE,on_click=clear_in_activation)
 
-    button_close_app=TextButton(text="Close App-إغلاق",icon=Icons.CLOSE,on_click=lambda e:page.window.destroy())
+    button_close_app=TextButton(text="Close App-إغلاق",icon=Icons.CLOSE,on_click=close_app)
 
     txt_info_2025_arabic="إذا كنت في سنة 2025 : اتصل بالانترنيت ثم ادخل الكود 1234 و اضغط على زر تفعيل."
     txt_info_2025_english="*If you are in the year 2025,connect to\nthe internet, then enter the code\n '1234' and press the Activate button."
@@ -1090,7 +1093,7 @@ def main(page:Page):
                                      ,on_click=on_click_B_number_question)
 
     #
-    text_answer=TextButton(content=Text("-",size=SIZE_TEXT), width=B_with, height=40)
+    text_answer=TextButton(content=Text("-",size=18), width=B_with, height=40)
 
     B1=FilledButton(content=Text("1",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
     B2=FilledButton(content=Text("2",size=SIZE_TEXT),bgcolor="#ff585d",width=B_with,height=B_hieght,on_click=on_click)
